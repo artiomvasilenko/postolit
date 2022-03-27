@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os.path
 from pathlib import Path
+import dj_database_url
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-muiw=ziy)h07y*i#aq0bv*k=-dw$t5vil+zd^g#_%2@8i0a&$b'
-import os
+
 SECRET_KEY = os.environ.get('DJNAGO_SECRET_KEY', 'ziy)h07y*i#aq0bv*k=-dw$t5vil+zd^g#_%2@8i0a&$b')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -52,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'WebBooks.urls'
@@ -129,3 +132,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Переадресация на главную страницу сайта после входа в систему
 LOGIN_REDIRECT_URL = '/'
+
+# Heroku: Обновление конфигурации базы данных из $DATABASE_URL.
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
+
+# Статичные файлы (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.10/howto/static-files/
+# Абсолютный путь к каталогу, в котором collectstatic
+# будет собирать статические файлы для развёртывания
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Упрощённая обработка статистических файлов.
+# http://warehouse.python.org/project/whitenoise/
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
